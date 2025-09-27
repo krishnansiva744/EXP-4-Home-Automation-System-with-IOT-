@@ -1,8 +1,7 @@
 # EXP-4-Home-Automation-System-with-IOT
 
 # Aim:
-To make a Lamp at home (230 V AC) On / Off using ESP8266, IFTT Google Assistance and Blynk IoT mobile application. 
-
+	To make a Lamp at home (230 V AC) On / Off using ESP8266, IFTT Google Assistance and Blynk IoT mobile application. 
 # Hardware / Software Tools required :
 PC with Internet connection
 Micro USB cable
@@ -15,8 +14,8 @@ Arduino software
 Jumper Wires
 
 # Circuit Diagram:
+<img width="842" height="496" alt="image" src="https://github.com/user-attachments/assets/e8e2492a-28a6-4f21-8824-95fb06c4596b" />
 
-<img width="1295" height="727" alt="Screenshot 2025-09-23 143908" src="https://github.com/user-attachments/assets/3dc2efc4-ca47-4b90-bb2b-f61ada02305a" />
 
 # Theory: 
 
@@ -29,92 +28,64 @@ When we apply an active high signal to the signal pin of the relay module from a
 
 # Program:
 ```
+// C++ code
+//
 #include <Servo.h>
-#include <LiquidCrystal.h>
 
-LiquidCrystal lcd(A1,10,9,6,5,3);
-float value;
-int tmp = A0;
-const int pingPin = 7;
-int servoPin = 8;
+int dist = 0;
 
-Servo servo1;
-
-void setup() {
-  Serial.begin(9600);
-  servo1.attach(servoPin);
-  lcd.begin(16, 2);
-
-  pinMode(2, INPUT);    // PIR sensor
-  pinMode(4, OUTPUT);   // PIR LED
-  pinMode(11, OUTPUT);  // General LED
-  pinMode(12, OUTPUT);  // Temp HIGH LED
-  pinMode(13, OUTPUT);  // Temp LOW LED
-  pinMode(A0, INPUT);   // Temperature sensor
+long readUltrasonicDistance(int triggerPin, int echoPin)
+{
+  pinMode(triggerPin, OUTPUT);  // Clear the trigger
+  digitalWrite(triggerPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigger pin to HIGH state for 10 microseconds
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin, LOW);
+  pinMode(echoPin, INPUT);
+  // Reads the echo pin, and returns the sound wave travel time in microseconds
+  return pulseIn(echoPin, HIGH);
 }
 
-void loop() {
-  long duration, cm;
+Servo servo_8;
 
-  // Ultrasonic
-  pinMode(pingPin, OUTPUT);
-  digitalWrite(pingPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(pingPin, HIGH);
-  delayMicroseconds(5);
-  digitalWrite(pingPin, LOW);
+void setup()
+{
+  servo_8.attach(8, 500, 2500);
+  pinMode(2, INPUT);
+  pinMode(12, OUTPUT);
+  pinMode(A0, INPUT);
+  pinMode(9, OUTPUT);
+}
 
-  pinMode(pingPin, INPUT);
-  duration = pulseIn(pingPin, HIGH);
-  cm = microsecondsToCentimeters(duration);
-
-  if(cm < 40) {
-    servo1.write(90);
-    lcd.setCursor(0,1);
-    lcd.print("Door:OPEN   ");
+void loop()
+{
+  dist = 0.01723 * readUltrasonicDistance(7, 7);
+  if (dist <= 100) {
+    servo_8.write(90);
+    delay(1000); // Wait for 1000 millisecond(s)
   } else {
-    servo1.write(0);
-    lcd.setCursor(0,1);
-    lcd.print("Door:CLOSED ");
+    servo_8.write(0);
   }
-
-  // PIR sensor LED
-  int pir = digitalRead(2);
-  if(pir == HIGH) {
-    digitalWrite(4, HIGH);
-    lcd.setCursor(10,0);
-    lcd.print("LED:ON ");
-  } else {
-    digitalWrite(4, LOW);
-    lcd.setCursor(10,0);
-    lcd.print("LED:OFF");
-  }
-
-  // Temperature
-  value = analogRead(tmp) * 0.004882814;
-  value = (value - 0.5) * 100.0;
-  lcd.setCursor(0,0);
-  lcd.print("Tmp:");
-  lcd.print(value);
-
-  Serial.print("temperature: ");
-  Serial.println(value);
-
-  if(value > 20) {
-    digitalWrite(12, HIGH);  // Hot LED ON
-    digitalWrite(13, LOW);
+  delay(1000); // Wait for 1000 millisecond(s)
+  if (digitalRead(2) == 1) {
+    digitalWrite(12, HIGH);
+    delay(1000); // Wait for 1000 millisecond(s)
   } else {
     digitalWrite(12, LOW);
-    digitalWrite(13, HIGH);  // Cold LED ON
+    delay(1000); // Wait for 1000 millisecond(s)
   }
-
-  delay(500);
+  if (analogRead(A0) > 200) {
+    digitalWrite(9, HIGH);
+    delay(1000); // Wait for 1000 millisecond(s)
+  } else {
+    digitalWrite(9, LOW);
+    delay(1000); // Wait for 1000 millisecond(s)
+  }
 }
+ ```
 
-long microsecondsToCentimeters(long microseconds) {
-  return microseconds / 29 / 2;
-}
-```
 # Procedure:
 •	Make the circuit connection as per the diagram. In the mobile, download and “Blynq IoT” application using Google play store and Install it. Create log in ID and Password.
 •	Connect the IN pin of the Relay module to D1 pin of NodeMCU (ESP8266).
@@ -134,9 +105,8 @@ long microsecondsToCentimeters(long microseconds) {
 
 # Output:
 
-<img width="1089" height="670" alt="Screenshot 2025-09-23 144511" src="https://github.com/user-attachments/assets/9e135041-7d23-4206-aefa-3845696926ef" />
+https://github.com/user-attachments/assets/68b1d3ba-aac1-43e8-be91-ca7f92361266
 
-https://github.com/user-attachments/assets/dbaa91aa-c468-4d43-990f-bf9bab8ff6a3
 
 # Result:
-The Home Automation System with IoT successfully enabled remote monitoring and control of home appliances through the internet.
+Thus,Home-Automation-System-with-IOT is successfully implemented using TinkerCad Circuit.
